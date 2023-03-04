@@ -6,8 +6,10 @@ $ poetry run uvicorn main:app --reload
 http://localhost:8000/docs
 """
 
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI, Response, status
 from fastapi.security import HTTPBearer
+
+from utils import VerifyToken
 
 # Authorizationヘッダのスキーマ
 token_auth_scheme = HTTPBearer()
@@ -27,9 +29,16 @@ def public():
 
 
 @app.get("/api/private")
-def private(token: str = Depends(token_auth_scheme)):
+def private(response: Response, token: str = Depends(token_auth_scheme)):
     """アクセストークンが必要なエンドポイント"""
 
-    result = token.credentials
+    print(f"token.credentials = {token.credentials}")
+
+    result = VerifyToken(token.credentials).verify()
+    print(f"result = {result}")
+
+    if result.get("status"):
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return result
 
     return result

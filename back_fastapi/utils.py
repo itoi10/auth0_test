@@ -34,11 +34,11 @@ class VerifyToken:
         try:
             self.signing_key = self.jwks_client.get_signing_key_from_jwt(self.token).key
 
-        except jwt.exceptions.PyJWKClienError as e:
-            return {"status": "error", "message": e.__str__()}
+        except jwt.exceptions.PyJWKClientError as e:
+            return {"status": "error", "message": "PyJWTClientError: " + e.__str__()}
 
         except jwt.exceptions.DecodeError as e:
-            return {"status": "error", "message": e.__str__()}
+            return {"status": "error", "message": "DecodeError: " + e.__str__()}
 
         # JWTをデコードしてトークンのpayloadを取得
         try:
